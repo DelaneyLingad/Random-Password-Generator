@@ -4,7 +4,6 @@ const characters = ["A","B","C","D","E","F","G","H","I","J","K","L","M","N","O",
 "~","`","!","@","#","$","%","^","&","*","(",")","_","-","+","=",
 "{","[","}","]",",","|",":",";","<",">",".","?","/"];
 
-
 // generate the passwords
 let passwordOneEl = document.getElementById("password-1-el")
 let passwordTwoEl = document.getElementById("password-2-el")
@@ -30,11 +29,23 @@ passwordTwoEl.addEventListener("click", () => {
 
 function copyToClipboard(text) {
     if (!text) return; // don't copy if empty
-    navigator.clipboard.writeText(text)
-        .then(() => {
-            console.log("Copied to clipboard:", text)
-        })
-        .catch(err => {
-            console.error("Failed to copy:", err)
-        })
+
+    if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(text)
+            .then(() => console.log("Copied to clipboard"))
+            .catch(() => fallbackCopy(text));
+    } else {
+        // fallback
+        fallbackCopy(text)
+    }
+}
+
+function fallbackCopy(text) {
+    const textarea = document.createElement("textarea");
+    textarea.value = text;
+    document.body.appendChild(textarea);
+    textarea.select();
+    document.execCommand("copy");
+    document.body.removeChild(textarea);
+    console.log("Copied with fallback");
 }

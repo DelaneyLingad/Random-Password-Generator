@@ -4,42 +4,67 @@ const characters = ["A","B","C","D","E","F","G","H","I","J","K","L","M","N","O",
 "~","`","!","@","#","$","%","^","&","*","(",")","_","-","+","=",
 "{","[","}","]",",","|",":",";","<",">",".","?","/"];
 
+// toggle checkboxes
+const specialCheckbox = document.getElementById("special-characters-checkbox")
+const numbersCheckbox = document.getElementById("numbers-checkbox")
+
 // generate the passwords
 let passwordOneEl = document.getElementById("password-1-el")
 let passwordTwoEl = document.getElementById("password-2-el")
 
 function generatePasswords() {
+    let allowedCharacters = []
+    
+    // letters always included
+    characters.forEach(char => {
+        if (/[a-zA-Z]/.test(char)) { // check if character is an uppercase or lowercase letter
+            allowedCharacters.push(char)
+        }
+    })
+    
+    // numbers
+    if (numbersCheckbox.checked) {
+        characters.forEach(char => {
+            if (/\d/.test(char)) { // check if character is a digit
+                allowedCharacters.push(char)
+            }
+        })
+    }
+    
+    // special characters
+    if (specialCheckbox.checked) {
+        characters.forEach(char => {
+            if (/[^a-zA-Z0-9]/.test(char)) {
+                allowedCharacters.push(char);
+            }
+        })
+    }
+
     let passwordOne = ""
     let passwordTwo = ""
     for (let i = 0; i < 16; i++) {
-        passwordOne += characters[Math.floor(Math.random()*characters.length)]
-        passwordTwo += characters[Math.floor(Math.random()*characters.length)]
+        passwordOne += allowedCharacters[Math.floor(Math.random()*allowedCharacters.length)]
+        passwordTwo += allowedCharacters[Math.floor(Math.random()*allowedCharacters.length)]
     }
     passwordOneEl.textContent = passwordOne
     passwordTwoEl.textContent = passwordTwo
 }
 
 // copy password to clipboard
-passwordOneEl.addEventListener("click", () => {
-    copyToClipboard(passwordOneEl.textContent)
-})
-passwordTwoEl.addEventListener("click", () => {
-    copyToClipboard(passwordTwoEl.textContent)
-})
-
-function copyToClipboard(text) {
-    if (!text) return; // don't copy if empty
-
-    if (navigator.clipboard && window.isSecureContext) {
-        navigator.clipboard.writeText(text)
-            .then(() => console.log("Copied to clipboard"))
-            .catch(() => fallbackCopy(text));
-    } else {
-        // fallback
-        fallbackCopy(text)
-    }
+function copyToClipboard(elementId) {
+    const text = document.getElementById(elementId).textContent;
+    if (!text) return;
+    
+    navigator.clipboard.writeText(text)
+        .then(() => {
+            alert("Copied to clipboard");
+        })
+        .catch(() => {
+            fallbackCopy(text);
+        })
 }
 
+// fallback for old browsers
 function fallbackCopy(text) {
     const textarea = document.createElement("textarea");
     textarea.value = text;
@@ -47,5 +72,4 @@ function fallbackCopy(text) {
     textarea.select();
     document.execCommand("copy");
     document.body.removeChild(textarea);
-    console.log("Copied with fallback");
 }

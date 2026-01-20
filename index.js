@@ -40,9 +40,12 @@ function generatePasswords() {
         })
     }
 
+    let passwordLength = Number(document.getElementById("password-length-input").value) || 16
+    if (passwordLength > 64) passwordLength = 64; // max 64 characters
+    
     let passwordOne = ""
     let passwordTwo = ""
-    for (let i = 0; i < 16; i++) {
+    for (let i = 0; i < passwordLength; i++) {
         passwordOne += allowedCharacters[Math.floor(Math.random()*allowedCharacters.length)]
         passwordTwo += allowedCharacters[Math.floor(Math.random()*allowedCharacters.length)]
     }
